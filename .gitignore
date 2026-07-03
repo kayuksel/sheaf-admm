@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+dist/
+build/
+# generated artifacts
+datasets/
+runs/
+outputs/
+wandb/
+*.npy
+*.npz
+*.pkl
+history.json
+*.out
+*.log
+# local tooling — not part of the public repo
+.claude/

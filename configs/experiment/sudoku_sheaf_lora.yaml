@@ -1,0 +1,46 @@
+# @package _global_
+# Sheaf-ADMM Sudoku with LoRA-modulated restriction maps.
+task: sudoku
+model_type: sheaf
+
+training:
+  lr: 1.7e-3
+  weight_decay: 1.0e-7
+  epochs: 10
+  K_train: 20
+  K_eval: 50
+  loss_window: 2
+  train_iters_dist: fixed
+  val_interval: 1
+
+data:
+  dir: datasets/sudoku_easy
+  train_split: train
+  val_splits: [test_hard]
+  loader: puzzle
+
+task_cfg: {}
+
+model:
+  num_classes: 10
+  d_v: 288
+  d_e: 32
+  encoder_arch: sudoku
+  enc_d_model: 128
+  enc_num_blocks: 2
+  comm_norm_type: layernorm
+  objective_mode: non_negative
+  x_solver: diagonal_prox
+  z_solver: unrolled_cg
+  z_mode: prox
+  gamma: 2.0
+  cg_iters: 5
+  rm_sharing: sudoku
+  rm_init: soft_slice
+  rm_mode: context          # LoRA modulation on
+  lora_rank: 4
+  lora_init_style: standard
+  num_directions: 9
+  rho_init: 0.25
+  decoder_arch: sudoku
+  dec_hidden_dims: [256]

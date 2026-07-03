@@ -1,0 +1,52 @@
+# @package _global_
+# MNIST classification (clean ~98.5%): 28x28 image, non-overlapping 3x3 patches
+# (stride 3 -> 81 agents). Global (shared) restriction map, hard consensus (Fz=0).
+task: mnist
+model_type: sheaf
+
+training:
+  lr: 1.0e-3
+  weight_decay: 1.0e-7
+  epochs: 20
+  K_train: 20
+  K_eval: 100
+  loss_window: 2
+  train_iters_dist: fixed
+  val_interval: 5
+
+data:
+  dir: datasets/mnist
+  train_split: train
+  val_splits: [test]
+  loader: image
+
+task_cfg:
+  patch_size: 3
+  stride: 3          # paper Table 4 stride
+  connectivity: 8
+  num_classes: 10
+
+model:
+  num_classes: 10
+  d_v: 32
+  d_e: 24
+  encoder_arch: mlp
+  enc_hidden_dim: 256
+  comm_norm_type: layernorm
+  objective_mode: lasso
+  l1_weight: 0.006337180166370117
+  x_solver: diagonal_prox
+  z_solver: unrolled_cg
+  z_mode: project          # hard consensus (Fz = 0)
+  cg_iters: 5
+  tikhonov_eps: 1.0e-5
+  rm_sharing: global       # one shared restriction map
+  rm_init: orthonormal
+  rm_mode: context
+  lora_rank: 8
+  lora_init_style: legacy
+  num_directions: 8
+  rho_init: 0.12
+  decoder_arch: classification
+  dec_linear_head: true
+  dec_readout_mode: x_only

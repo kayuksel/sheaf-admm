@@ -1,0 +1,44 @@
+# @package _global_
+# Sheaf-ADMM Sudoku with fixed restriction maps.
+task: sudoku
+model_type: sheaf
+
+training:
+  lr: 1.7e-3
+  weight_decay: 1.0e-7
+  epochs: 10
+  K_train: 20
+  K_eval: 50
+  loss_window: 2
+  train_iters_dist: fixed
+  val_interval: 1
+
+data:
+  dir: datasets/sudoku_easy
+  train_split: train
+  val_splits: [test_hard]
+  loader: puzzle
+
+task_cfg: {}   # 27 row/col/box agents are derived from the multigraph
+
+model:
+  num_classes: 10
+  d_v: 288               # 9 cells x 32-dim blocks
+  d_e: 32
+  encoder_arch: sudoku
+  enc_d_model: 128
+  enc_num_blocks: 2
+  comm_norm_type: layernorm
+  objective_mode: non_negative      # closed-form x = max((rho(z-y)-q)/(D+rho), 0)
+  x_solver: diagonal_prox
+  z_solver: unrolled_cg
+  z_mode: prox
+  gamma: 2.0
+  cg_iters: 5
+  rm_sharing: sudoku                # 9 base maps = selectors onto 9 disjoint 32-d blocks
+  rm_init: soft_slice
+  rm_mode: fixed
+  num_directions: 9
+  rho_init: 0.25
+  decoder_arch: sudoku
+  dec_hidden_dims: [256]

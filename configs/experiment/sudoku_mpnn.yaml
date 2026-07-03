@@ -1,0 +1,36 @@
+# @package _global_
+# Recurrent-MPNN Sudoku baseline.
+task: sudoku
+model_type: mpnn
+
+training:
+  lr: 3.0e-4
+  weight_decay: 1.0e-7
+  epochs: 5
+  mpnn_train_rounds: 20
+  mpnn_eval_rounds: 50
+  val_interval: 1
+
+data:
+  dir: datasets/sudoku_easy
+  train_split: train
+  val_splits: [test_hard]
+  loader: puzzle
+
+task_cfg: {}
+
+model:
+  num_classes: 10
+  d_v: 504
+  d_e: 32
+  encoder_arch: sudoku
+  enc_d_model: 128
+  enc_num_blocks: 2
+  comm_norm_type: layernorm
+  decoder_arch: sudoku
+  dec_hidden_dims: [256]
+  mpnn_message_dim: 32
+  mpnn_aggregation: max
+  mpnn_edge_type_mode: slot       # 9 shared-cell slots
+  num_directions: 9
+  mpnn_graph_readout: per_node

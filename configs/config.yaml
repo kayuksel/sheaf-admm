@@ -1,0 +1,51 @@
+# Base config. Shared optimization settings live here (the paper's shared HPs);
+# per-task architecture + solver settings come from configs/experiment/*.yaml,
+# selected with `+experiment=<name>`.
+defaults:
+  - _self_
+
+task: maze            # maze | mnist | sudoku  (selects the task hook)
+model_type: sheaf     # sheaf | mpnn
+
+wandb:
+  project: sheaf-admm
+  entity: null        # null -> your default wandb entity
+  name: null          # null -> wandb auto-name
+  group: null         # e.g. group seeds of one experiment together
+  tags: []
+  mode: disabled      # online | offline | disabled
+
+training:
+  seed: 42            # paper sweeps seeds {42, 123, 456}
+  lr: 3.0e-4
+  weight_decay: 1.0e-6
+  epochs: 50
+  batch_size: 128
+  warmup_steps: 200   # linear warmup -> constant LR
+  grad_clip: 1.0      # global-norm clip
+  ema_decay: 0.999    # EMA of params, used at eval
+  exit_on_nan: true
+  val_interval: 5
+
+  # ADMM horizon (Sheaf): K_train iterations at train, K_eval at eval.
+  K_train: 40
+  K_eval: 100
+  loss_window: 4              # average CE over the final w iterates
+  train_iters_dist: fixed     # fixed | uniform (Maze resamples K ~ U[train_iters_min, K_train])
+  train_iters_min: 15
+
+  # MPNN baseline message-passing rounds (the K analog for the recurrent MPNN).
+  mpnn_train_rounds: 40
+  mpnn_eval_rounds: 100
+
+data:
+  dir: ???            # set per experiment
+  train_split: train
+  val_splits: [test]
+  loader: puzzle      # puzzle (maze/sudoku) | image (mnist)
+
+# kwargs forwarded to the task hook (sheaf_admm.training.make_task)
+task_cfg: {}
+
+# sheaf_admm.models.ModelConfig fields (set per experiment)
+model: {}
